@@ -33,5 +33,17 @@ def print_menu():
 	print('│                              │')
 	print('└──────────────────────────────┘')
 
+def print_hangman(name, life, score, guessed_characters, used_characters):
+	print('┌──────────────────────────────┐')
+	print('│ Name: %s           ┌────┐    │' % (name))
+	print('│ Life: %s           │    0    │' % (life))
+	print('│ Score: %s          │   /|\   │' % (score))
+	print('│                    │   / \   │')
+	print('│                    ┴         │')
+	print('│                              │')
+	print('│      %s      │' % (guessed_characters))
+	print('│    - %s -    │' % (used_characters))
+	print('└──────────────────────────────┘')
+
 def get_cmd() -> str:
 	return input(PROMPT_SYMBOL)
