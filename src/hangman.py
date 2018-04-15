@@ -1,28 +1,56 @@
 import tui
 import rest
 import sys
+import game
 
 current_user = None
 
 def exec_cmd(cmd):
 	if cmd is 'q':
-		do_login()
+		if current_user == None:
+			do_login()
+		else:
+			tui.print_unknown_cmd()
 	elif cmd is 'w':
-		do_logout()
+		if current_user != None:
+			do_logout()
+		else:
+			tui.print_unknown_cmd()
 	elif cmd is 'e':
-		do_user_information()
+		if current_user != None:
+			do_user_information()
+		else:
+			tui.print_unknown_cmd()
 	elif cmd is 'd':
-		do_forgot_password()
+		if current_user == None:
+			do_forgot_password()
+		else:
+			tui.print_unknown_cmd()
 	elif cmd is 'r':
-		do_play()
+		if current_user != None:
+			do_play()
+		else:
+			tui.print_unknown_cmd()
 	elif cmd is 't':
-		do_lobby()
+		if current_user != None:
+			do_lobby()
+		else:
+			tui.print_unknown_cmd()
 	elif cmd is 'a':
-		do_high_scores()
+		if current_user != None:
+			do_high_scores()
+		else:
+			tui.print_unknown_cmd()
 	elif cmd is 's':
-		do_send_email()
+		if current_user != None:
+			do_send_email()
+		else:
+			tui.print_unknown_cmd()
 	elif cmd is 'f':
-		do_new_password()
+		if current_user != None:
+			do_new_password()
+		else:
+			tui.print_unknown_cmd()
 	elif cmd is 'g':
 		do_about()
 	elif cmd is 'x':
@@ -94,11 +122,11 @@ def do_send_email():
 	if rest.send_email(username, password, subject, message):
 		tui.clear()
 		tui.print_menu(rest.get_current_user_amount(), current_user)
-		print(tui.print_send_email_success(username))
+		tui.print_send_email_success(username)
 	else:
 		tui.clear()
 		tui.print_menu(rest.get_current_user_amount(), current_user)
-		print(tui.print_send_email_failed(username))
+		tui.print_send_email_failed(username)
 
 def do_new_password():
 	global current_user
@@ -148,12 +176,19 @@ def do_exit():
 	sys.exit()
 
 def do_play():
-	pass
+	global current_user
+	game.start(current_user)
+	tui.clear()
+	tui.print_menu(rest.get_current_user_amount(), current_user)
 
 def do_lobby():
-	pass
+	tui.clear()
+	tui.print_menu(rest.get_current_user_amount(), current_user)
+	tui.print_lobby(rest.get_all_logged_in_users_score())
 
 def do_high_scores():
-	pass
-
+	tui.clear()
+	tui.print_menu(rest.get_current_user_amount(), current_user)
+	tui.print_high_scores(rest.get_all_users_highscore())
+	
 if __name__ == '__main__': main()

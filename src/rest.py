@@ -138,7 +138,7 @@ def guess(username, char) -> bool:
 	local_url = '{}/guess?username={}&ch={}'.format(url, username, char)
 	result = requests.post(local_url)
 	if is_ok_status(result):
-		return result.text is 'true'
+		return result.text == 'true'
 	else:
 		return False
 

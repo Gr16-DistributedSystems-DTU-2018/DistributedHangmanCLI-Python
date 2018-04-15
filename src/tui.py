@@ -1,4 +1,5 @@
 import os
+import json
 
 PROMPT_SYMBOL = '» '
 
@@ -27,7 +28,7 @@ def print_menu(users_online, user):
 	if user != None:
 		user_str = '│ User: {} {}'.format(user['fornavn'], user['efternavn'])
 
-	user_str = trim_str(user_str, 36)
+	user_str = trim_str(user_str, 36, True)
 
 	print('┌────────────────────────────────────┐')
 	print('│   Welcome to Distributed Hangman!  │')
@@ -57,25 +58,44 @@ def print_menu(users_online, user):
 		print('│ (a) High Scores                    │')
 		print('│                                    │')
 		print('│ (s) Send Email                     │')
-		print('│ (f) New Password                   │')
+		print('│ (f) Change Password                │')
 	
 	print('│                                    │')
 	print('│ (g) About                          │')
 	print('│ (x) Exit                           │')
 	print('└────────────────────────────────────┘')
 
-def print_hangman(name, life, score, guessed_characters, used_characters):
+def print_hangman(name, life, score, word, used_chars):
+	hangman_list = ['0', '/', '|', '\\', '/', '\\']
+
+	hangman_show_list = []
+
+	life_lost = 6 - life
+
+	for i in range(0, 6):
+		if i < life_lost:
+			hangman_show_list.append(hangman_list[i])
+		else:
+			hangman_show_list.append(' ')
+	
+	name_str = trim_str(name, 10, False)
+	life_str = trim_str(str(life), 1, False)
+	score_str = trim_str(str(score), 7, False)
+
+	word_str = trim_str(word, 28, False)
+	used_chars_str = trim_str(used_chars, 28, False)
+
 	print('┌──────────────────────────────┐')
 	print('│      Distributed Hangman     │')
 	print('├──────────────────────────────┤')
-	print('│ Name: {}           ┌────┐    │'.format(name))
-	print('│ Life: {}           │    0    │'.format(life))
-	print('│ Score: {}          │   /|\   │'.format(score))
-	print('│                    │   / \   │')
+	print('│ Name:  {}  ┌────┐    │'.format(name_str))
+	print('│ Life:  {}           │    {}    │'.format(life_str, hangman_show_list[0]))
+	print('│ Score: {}     │   {}{}{}   │'.format(score_str, hangman_show_list[1], hangman_show_list[2], hangman_show_list[3]))
+	print('│                    │   {} {}   │'.format(hangman_show_list[4], hangman_show_list[5]))
 	print('│                    ┴         │')
 	print('│                              │')
-	print('│      {}                      │'.format(guessed_characters))
-	print('│    - {} -                    │'.format(used_characters))
+	print('│ {} │'.format(word_str))
+	print('│ {} │'.format(used_chars_str))
 	print('└──────────────────────────────┘')
 
 def print_unknown_cmd():
@@ -138,6 +158,51 @@ def print_exit():
 	print('│             Bye!             │')
 	print('└──────────────────────────────┘')
 
+def print_correct_guess(char):
+	print('┌──────────────────────────────┐')
+	print('│             Guess            │')
+	print('├──────────────────────────────┤')
+	print('│ Good job! You guessed {}!     │'.format(char))
+	print('└──────────────────────────────┘')
+
+def print_wrong_guess(char):
+	print('┌──────────────────────────────┐')
+	print('│             Guess            │')
+	print('├──────────────────────────────┤')
+	print('│ Sorry!                       │')
+	print('│ {} was not in the word!       │'.format(char)) 
+	print('└──────────────────────────────┘')
+
+def print_win():
+	print('┌──────────────────────────────┐')
+	print('│              Win             │')
+	print('├──────────────────────────────┤')
+	print('│ Congratulations! You won!    │')
+	print('└──────────────────────────────┘')
+
+def print_loss():
+	print('┌──────────────────────────────┐')
+	print('│             Loss             │')
+	print('├──────────────────────────────┤')
+	print('│ Sorry, you lost.             │')
+	print('│ Better luck next time!       │')
+	print('└──────────────────────────────┘')
+
+def print_play_again():
+	print('┌──────────────────────────────┐')
+	print('│         Play again?          │')
+	print('├──────────────────────────────┤')
+	print('│ Would you like to play       │')
+	print('│ another round?               │')
+	print('└──────────────────────────────┘')
+
+def print_already_guessed(char):
+	print('┌──────────────────────────────┐')
+	print('│             Guess            │')
+	print('├──────────────────────────────┤')
+	print('│ {} is already guessed!        │'.format(char))
+	print('└──────────────────────────────┘')
+
 def print_user_information(current_user):
 	campusnetid_str = '│ CampusNetID : {}'.format(current_user['campusnetId'])
 	username_str =    '│ Username    : {}'.format(current_user['brugernavn'])
@@ -147,13 +212,13 @@ def print_user_information(current_user):
 	study_str =       '│ Study       : {}'.format(current_user['studeretning'])
 	last_active_str = '│ Last Active : {}'.format(current_user['sidstAktiv'])
 
-	campusnetid_str = trim_str(campusnetid_str, 41)
-	username_str = trim_str(username_str, 41)
-	first_name_str = trim_str(first_name_str, 41)
-	last_name_str = trim_str(last_name_str, 41)
-	email_str = trim_str(email_str, 41)
-	study_str = trim_str(study_str, 41)
-	last_active_str = trim_str(last_active_str, 41)
+	campusnetid_str = trim_str(campusnetid_str, 41, True)
+	username_str = trim_str(username_str, 41, True)
+	first_name_str = trim_str(first_name_str, 41, True)
+	last_name_str = trim_str(last_name_str, 41, True)
+	email_str = trim_str(email_str, 41, True)
+	study_str = trim_str(study_str, 41, True)
+	last_active_str = trim_str(last_active_str, 41, True)
 
 	print('┌─────────────────────────────────────────┐')
 	print('│             User Information            │')
@@ -181,19 +246,23 @@ def print_send_email_prompt():
 	print('└──────────────────────────────┘')
 
 def print_send_email_success(username):
+	username_str =    '│ {}!'.format(username)
+	username_str = trim_str(username_str, 30, True)
 	print('┌──────────────────────────────┐')
 	print('│          Send Email          │')
 	print('├──────────────────────────────┤')
 	print('│ Successfully send email to   │')
-	print('│ {}!                    │'.format(username))
+	print(username_str)
 	print('└──────────────────────────────┘')
 
 def print_send_email_failed(username):
+	username_str =    '│ {}!'.format(username)
+	username_str = trim_str(username_str, 30, True)
 	print('┌──────────────────────────────┐')
 	print('│          Send Email          │')
 	print('├──────────────────────────────┤')
 	print('│ Failed to send email to      │')
-	print('│ {}!                    │'.format(username))
+	print(username_str)
 	print('└──────────────────────────────┘')
 
 def print_forgot_password():
@@ -229,7 +298,7 @@ def print_about():
 
 def print_new_password():
 	print('┌──────────────────────────────┐')
-	print('│         New Password         │')
+	print('│        Change Password       │')
 	print('├──────────────────────────────┤')
 	print('│ Please enter your username,  │')
 	print('│ current password and a new   │')
@@ -238,7 +307,7 @@ def print_new_password():
 
 def print_new_password_success():
 	print('┌──────────────────────────────┐')
-	print('│         New Password         │')
+	print('│        Change Password       │')
 	print('├──────────────────────────────┤')
 	print('│ Successfully changed         │')
 	print('│ password!                    │')
@@ -246,19 +315,77 @@ def print_new_password_success():
 
 def print_new_password_failed():
 	print('┌──────────────────────────────┐')
-	print('│         New Password         │')
+	print('│        Change Password       │')
 	print('├──────────────────────────────┤')
 	print('│ Failed to change password!   │')
 	print('└──────────────────────────────┘')
 
-def trim_str(string, max_len) -> str:
+def print_new_highscore(highscore):
+	high_score_str = trim_str(str(highscore), 28, False)
+	print('┌──────────────────────────────┐')
+	print('│          High Score          │')
+	print('├──────────────────────────────┤')
+	print('│ Reached new high score!      │')
+	print('│ {} │'.format(high_score_str))
+	print('└──────────────────────────────┘')
+
+def print_lobby(user_map):
+	print('┌──────────────────────────────┐')
+	print('│             Lobby            │') # length 32
+	print('├──────────────────────────────┤') # s151641 length 7 so thats 7 max for the username # Score 6 is max
+	print('│ User        Score     Battle │')
+	print('├──────────────────────────────┤')
+
+	char = 'a'
+	for username, score in user_map.items():
+		username = add_leading_zeroes(username, 7)
+		score = add_leading_zeroes(score, 6)
+		print('│ {}     {}    ({})    │'.format(username, score, char))
+		char = chr(ord(char) + 1)
+	print('└──────────────────────────────┘')
+
+def print_high_scores(user_map):
+	print('┌──────────────────────────────┐')
+	print('│          High Scores         │') # length 32
+	print('├──────────────────────────────┤') # s151641 length 7 so thats 7 max for the username # Score 6 is max
+	print('│ User              High Score │')
+	print('├──────────────────────────────┤')
+
+	for username, score in user_map.items():
+		username = add_leading_zeroes(username, 7)
+		score = add_leading_zeroes(score, 6)
+		print('│ {}           {}     │'.format(username, score))
+
+	print('└──────────────────────────────┘')
+
+def trim_str(string, max_len, is_with_end_pipe) -> str:
 	delta_len = max_len - len(string)
 	for i in range(0, delta_len):
 		string += ' '
 		if i == delta_len - 1:
-			string += ' │'
+			if is_with_end_pipe:
+				string += ' │'
 			break
-	return string;
+	return string
+
+def add_leading_zeroes(string, length) -> str:
+	string = str(string)
+	if len(string) > length:
+		return
+
+	if len(string) < length:
+		delta_len = length - len(string)
+		string += (' ' * delta_len)
+
+	return string 
+
+def get_user_guess():
+	while True:
+		guess = get_user_input('Guess')
+		if (len(str(guess)) > 1):
+			continue
+		else:
+			return guess
 
 def get_cmd() -> str:
 	return input(PROMPT_SYMBOL)
