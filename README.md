@@ -2,4 +2,4 @@
 
 ## Instructions
 
-Run the game.py file to execute the game!
+Run the hangman.py file to execute the game.
