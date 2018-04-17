@@ -170,6 +170,14 @@ def do_about():
 	tui.print_about()
 
 def do_exit():
+	global current_user
+
+	if current_user == None:
+		return
+
+	rest.logout(current_user['brugernavn'])
+	current_user = None
+
 	tui.clear()
 	tui.print_menu(rest.get_current_user_amount(), current_user)
 	tui.print_exit()
